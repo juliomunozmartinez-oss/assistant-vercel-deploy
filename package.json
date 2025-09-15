@@ -1,0 +1,16 @@
+{
+  "name": "assistant-vercel",
+  "version": "1.0.0",
+  "description": "Simple web chat to interact with an OpenAI Assistant using Vercel",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "openai": "^4.0.0"
+  }
+}
