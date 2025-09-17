@@ -58,28 +58,27 @@ export default async function handler(req, res) {
         .join("\n");
     }
 
-    // 🔎 Filtrar solo la parte del cliente (después de 'Copy WhatsApp (cliente):')
+    // Separar bloques
+    let internal = reply;
+    let client = "";
     const clientIndex = reply.indexOf("Copy WhatsApp (cliente):");
     if (clientIndex !== -1) {
-      reply = reply.substring(clientIndex).replace("Copy WhatsApp (cliente):", "").trim();
+      internal = reply.substring(0, clientIndex).trim();
+      client = reply.substring(clientIndex).replace("Copy WhatsApp (cliente):", "").trim();
     }
 
-    // 🚀 Post-procesamiento: saltos de línea + emojis
-    reply = reply.replace(/ - /g, "\n");
-    reply = reply
-      .replace(/\*\*Equipo:\*\*/g, "📱 **Equipo:**")
-      .replace(/\*\*Pago mensual.*\*\*/g, "💳 $&")
-      .replace(/\*\*Plan:\*\*/g, "📝 **Plan:**")
-      .replace(/\*\*Renta mensual:\*\*/g, "🏠 **Renta mensual:**")
-      .replace(/\*\*Total mensual:\*\*/g, "💰 **Total mensual:**")
-      .replace(/\*\*GB:\*\*/g, "📊 **GB:**")
-      .replace(/\*\*Minutos\/SMS:\*\*/g, "📞 **Minutos/SMS:**")
-      .replace(/\*\*Redes sociales ilimitadas:\*\*/g, "🌐 **Redes sociales ilimitadas:**")
-      .replace(/\*\*Cashback:\*\*/g, "🎁 **Cashback:**")
-      .replace(/\*\*Inventario:\*\*/g, "📦 **Inventario:**")
-      .replace(/\*\*Promoción:\*\*/g, "🎉 **Promoción:**");
+    function format(text) {
+      return text         .replace(/ - /g, "\n")         .replace(/\*\*Equipo:\*\*/g, "📱 **Equipo:**")         .replace(/\*\*Pago mensual.*\*\*/g, "💳 $&")         .replace(/\*\*Plan:\*\*/g, "📝 **Plan:**")         .replace(/\*\*Renta mensual:\*\*/g, "🏠 **Renta mensual:**")         .replace(/\*\*Total mensual:\*\*/g, "💰 **Total mensual:**")         .replace(/\*\*GB:\*\*/g, "📊 **GB:**")         .replace(/\*\*Minutos\/SMS:\*\*/g, "📞 **Minutos/SMS:**")         .replace(/\*\*Redes sociales ilimitadas:\*\*/g, "🌐 **Redes sociales ilimitadas:**")         .replace(/\*\*Cashback:\*\*/g, "🎁 **Cashback:**")         .replace(/\*\*Inventario:\*\*/g, "📦 **Inventario:**")         .replace(/\*\*Promoción:\*\*/g, "🎉 **Promoción:**");
+    }
 
-    res.status(200).json({ reply });
+    const finalReply = 
+      "📋 **Respuesta interna (vendedor):**\n" +
+      format(internal) +
+      "\n\n---\n\n" +
+      "📲 **Copy WhatsApp (cliente):**\n" +
+      format(client);
+
+    res.status(200).json({ reply: finalReply });
   } catch (err) {
     console.error("Assistant API error", err);
     res.status(500).json({ error: "Error contacting assistant API" });
