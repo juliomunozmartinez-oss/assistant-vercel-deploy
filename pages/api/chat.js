@@ -58,6 +58,12 @@ export default async function handler(req, res) {
         .join("\n");
     }
 
+    // 🔎 Filtrar solo la parte del cliente (después de 'Copy WhatsApp (cliente):')
+    const clientIndex = reply.indexOf("Copy WhatsApp (cliente):");
+    if (clientIndex !== -1) {
+      reply = reply.substring(clientIndex).replace("Copy WhatsApp (cliente):", "").trim();
+    }
+
     // 🚀 Post-procesamiento: saltos de línea + emojis
     reply = reply.replace(/ - /g, "\n");
     reply = reply
