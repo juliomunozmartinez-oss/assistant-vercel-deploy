@@ -58,16 +58,19 @@ export default async function handler(req, res) {
         .join("\n");
     }
 
-    // Separar bloques vendedor y cliente
     let internal = reply;
     let client = "";
     const clientIndex = reply.indexOf("Copy WhatsApp (cliente):");
-    if (clientIndex !== -1) {
+    if (clientIndex != -1) {
       internal = reply.substring(0, clientIndex).trim();
       client = reply.substring(clientIndex).replace("Copy WhatsApp (cliente):", "").trim();
     }
 
-    // Función de formato con emojis
+    const promoMatch = reply.match(/🔥.*$/m);
+    if (promoMatch && !client.includes("🔥")) {
+      client += "\n\n" + promoMatch[0];
+    }
+
     function format(text) {
       return text
         .replace(/ - /g, "\n")
@@ -84,17 +87,14 @@ export default async function handler(req, res) {
         .replace(/\*\*Promoción:\*\*/g, "🎉 **Promoción:**");
     }
 
-    // Limpieza extra
     function clean(text) {
-      return text
-        .replace(/\s*-\s*/g, "\n") // guiones -> saltos de línea
-        .replace(/\n{2,}/g, "\n");  // evitar saltos múltiples
+      return text.replace(/\s*-\s*/g, "\n").replace(/\n{2,}/g, "\n");
     }
 
     const finalReply =
       "📋 **Respuesta interna (vendedor):**\n" +
-      clean(format(internal)) +
-      "\n\n---\n\n" +
+      clean(format(internal)).replace(/\*\*Respuesta interna \(vendedor\):\*\*/g, "") +
+      "\n\n━━━━━━━━━━━━━━\n\n" +
       "📲 **Copy WhatsApp (cliente):**\n" +
       clean(format(client));
 
