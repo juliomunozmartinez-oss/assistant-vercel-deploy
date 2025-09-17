@@ -58,7 +58,7 @@ export default async function handler(req, res) {
         .join("\n");
     }
 
-    // Separar bloques
+    // Separar bloques vendedor y cliente
     let internal = reply;
     let client = "";
     const clientIndex = reply.indexOf("Copy WhatsApp (cliente):");
@@ -67,16 +67,36 @@ export default async function handler(req, res) {
       client = reply.substring(clientIndex).replace("Copy WhatsApp (cliente):", "").trim();
     }
 
+    // Función de formato con emojis
     function format(text) {
-      return text         .replace(/ - /g, "\n")         .replace(/\*\*Equipo:\*\*/g, "📱 **Equipo:**")         .replace(/\*\*Pago mensual.*\*\*/g, "💳 $&")         .replace(/\*\*Plan:\*\*/g, "📝 **Plan:**")         .replace(/\*\*Renta mensual:\*\*/g, "🏠 **Renta mensual:**")         .replace(/\*\*Total mensual:\*\*/g, "💰 **Total mensual:**")         .replace(/\*\*GB:\*\*/g, "📊 **GB:**")         .replace(/\*\*Minutos\/SMS:\*\*/g, "📞 **Minutos/SMS:**")         .replace(/\*\*Redes sociales ilimitadas:\*\*/g, "🌐 **Redes sociales ilimitadas:**")         .replace(/\*\*Cashback:\*\*/g, "🎁 **Cashback:**")         .replace(/\*\*Inventario:\*\*/g, "📦 **Inventario:**")         .replace(/\*\*Promoción:\*\*/g, "🎉 **Promoción:**");
+      return text
+        .replace(/ - /g, "\n")
+        .replace(/\*\*Equipo:\*\*/g, "📱 **Equipo:**")
+        .replace(/\*\*Pago mensual.*\*\*/g, "💳 $&")
+        .replace(/\*\*Plan:\*\*/g, "📝 **Plan:**")
+        .replace(/\*\*Renta mensual:\*\*/g, "🏠 **Renta mensual:**")
+        .replace(/\*\*Total mensual:\*\*/g, "💰 **Total mensual:**")
+        .replace(/\*\*GB:\*\*/g, "📊 **GB:**")
+        .replace(/\*\*Minutos\/SMS:\*\*/g, "📞 **Minutos/SMS:**")
+        .replace(/\*\*Redes sociales ilimitadas:\*\*/g, "🌐 **Redes sociales ilimitadas:**")
+        .replace(/\*\*Cashback:\*\*/g, "🎁 **Cashback:**")
+        .replace(/\*\*Inventario:\*\*/g, "📦 **Inventario:**")
+        .replace(/\*\*Promoción:\*\*/g, "🎉 **Promoción:**");
     }
 
-    const finalReply = 
+    // Limpieza extra
+    function clean(text) {
+      return text
+        .replace(/\s*-\s*/g, "\n") // guiones -> saltos de línea
+        .replace(/\n{2,}/g, "\n");  // evitar saltos múltiples
+    }
+
+    const finalReply =
       "📋 **Respuesta interna (vendedor):**\n" +
-      format(internal) +
+      clean(format(internal)) +
       "\n\n---\n\n" +
       "📲 **Copy WhatsApp (cliente):**\n" +
-      format(client);
+      clean(format(client));
 
     res.status(200).json({ reply: finalReply });
   } catch (err) {
