@@ -1,4 +1,3 @@
-import '../styles/globals.css'
 
 /* ====== Encabezado ====== */
 .header {
@@ -11,6 +10,7 @@ import '../styles/globals.css'
 .header img {
   height: 50px;
   object-fit: contain;
+  vertical-align: middle;
 }
 
 .header .logo-muga {
@@ -27,6 +27,9 @@ import '../styles/globals.css'
   margin: 0 auto;
   padding: 15px;
   font-family: Arial, sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background: #fff;
 }
 
 .message {
@@ -52,6 +55,23 @@ import '../styles/globals.css'
   max-width: 90%;
 }
 
+/* ====== Copy WhatsApp destacado ====== */
+.copy-whatsapp {
+  border-left: 4px solid #25D366; /* Verde WhatsApp */
+  background: #f0fdf4;           /* Fondo verde muy claro */
+  padding: 12px 16px;
+  margin-top: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-line; /* Mantener saltos de línea */
+}
+
+.copy-whatsapp strong {
+  color: #1a1a1a;
+}
+
 /* ====== Responsivo móviles ====== */
 @media (max-width: 768px) {
   .header img {
@@ -64,6 +84,10 @@ import '../styles/globals.css'
 
   .header .logo-telcel {
     max-height: 35px;
+  }
+
+  .header {
+    padding: 5px 10px;
   }
 
   .chat-container {
