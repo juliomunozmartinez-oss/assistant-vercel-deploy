@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Se configura en Vercel → Settings → Environment Variables
+  apiKey: process.env.OPENAI_API_KEY, // Configura en Vercel → Settings → Environment Variables
 });
 
 export default async function handler(req, res) {

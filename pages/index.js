@@ -1,4 +1,6 @@
 import { useState } from "react";
+import Image from "next/image";
+import "../styles/globals.css";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -19,62 +21,42 @@ export default function Home() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+    <div className="container">
       {/* Sidebar */}
-      <div
-        style={{
-          width: "250px",
-          background: "#001F5B",
-          color: "white",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <div>
-          <h2 style={{ color: "#fff" }}>📱 MuGa Mobiles</h2>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            <li>🏠 Inicio</li>
-            <li>📦 Planes Telcel</li>
-            <li>📊 Renovaciones</li>
-            <li>🌐 Internet en Casa</li>
-          </ul>
+      <aside className="sidebar">
+        <div className="sidebar-top">
+          <Image src="/muga.png" alt="MuGa Mobiles" width={180} height={60} />
+          <nav>
+            <ul>
+              <li>🏠 Inicio</li>
+              <li>📦 Planes Telcel</li>
+              <li>📊 Renovaciones</li>
+              <li>🌐 Internet en Casa</li>
+            </ul>
+          </nav>
         </div>
-        <div>
-          <p style={{ fontSize: "12px", color: "#ddd" }}>
-            © 2025 MuGa Holdings de México
-          </p>
+        <div className="sidebar-bottom">
+          <Image src="/telcel5g.png" alt="Telcel 5G" width={100} height={40} />
+          <p>© 2025 MuGa Holdings de México</p>
         </div>
-      </div>
+      </aside>
 
-      {/* Main content */}
-      <div style={{ flex: 1, padding: "2rem" }}>
+      {/* Main Content */}
+      <main className="main">
         <h1>🤖 Asesor Telcel – MuGa</h1>
 
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={4}
-          style={{ width: "100%", padding: "10px" }}
           placeholder="Ejemplo: precio galaxy a06 en libre 2"
         />
-        <button onClick={sendPrompt} style={{ marginTop: "10px" }}>
+        <button onClick={sendPrompt}>
           {loading ? "Generando..." : "Enviar"}
         </button>
 
-        <div
-          style={{
-            whiteSpace: "pre-wrap",
-            marginTop: "20px",
-            background: "#f4f4f4",
-            padding: "15px",
-            borderRadius: "8px",
-          }}
-        >
-          {response}
-        </div>
-      </div>
+        <div className="response-box">{response}</div>
+      </main>
     </div>
   );
 }
