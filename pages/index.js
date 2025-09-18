@@ -22,7 +22,13 @@ export default function Home() {
   // Dividir en dos bloques con regex flexible
   const parts = response.split(/Copy WhatsApp \(cliente\):/i);
   const internalBlock = parts[0] || "";
-  const clientBlock = parts[1] || "";
+  let clientBlock = parts[1] || "";
+
+  // 🔹 Fallback automático si no existe bloque cliente
+  if (!clientBlock.trim() && response) {
+    clientBlock =
+      "⚠️ El modelo no generó el copy de WhatsApp en esta respuesta. Puedes volver a intentarlo.";
+  }
 
   const toHtml = (text) => {
     if (!text) return "";
@@ -60,16 +66,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* Bloque cliente con botón de copiar */}
-      {clientBlock && (
-        <div className="response-box">
-          <h2>📲 Copy WhatsApp (cliente)</h2>
-          <div dangerouslySetInnerHTML={{ __html: toHtml(clientBlock) }} />
-          <button className="copy-btn" onClick={copyToClipboard}>
-            📋 Copiar al portapapeles
-          </button>
-        </div>
-      )}
+      {/* Bloque cliente con fallback */}
+      <div className="response-box">
+        <h2>📲 Copy WhatsApp (cliente)</h2>
+        <div dangerouslySetInnerHTML={{ __html: toHtml(clientBlock) }} />
+        <button className="copy-btn" onClick={copyToClipboard}>
+          📋 Copiar al portapapeles
+        </button>
+      </div>
     </div>
   );
 }
