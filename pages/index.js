@@ -19,14 +19,23 @@ export default function Home() {
     setLoading(false);
   };
 
-  // Dividir en dos bloques
-  const [internalBlock, clientBlock] = response.split("**Copy WhatsApp (cliente):**");
+  // Dividir en dos bloques con regex flexible
+  const parts = response.split(/Copy WhatsApp \(cliente\):/i);
+  const internalBlock = parts[0] || "";
+  const clientBlock = parts[1] || "";
 
   const toHtml = (text) => {
     if (!text) return "";
     return text
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\n/g, "<br/>");
+  };
+
+  const copyToClipboard = () => {
+    if (clientBlock) {
+      navigator.clipboard.writeText(clientBlock.trim());
+      alert("✅ Copiado al portapapeles");
+    }
   };
 
   return (
@@ -51,11 +60,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* Bloque cliente */}
+      {/* Bloque cliente con botón de copiar */}
       {clientBlock && (
         <div className="response-box">
           <h2>📲 Copy WhatsApp (cliente)</h2>
           <div dangerouslySetInnerHTML={{ __html: toHtml(clientBlock) }} />
+          <button className="copy-btn" onClick={copyToClipboard}>
+            📋 Copiar al portapapeles
+          </button>
         </div>
       )}
     </div>
