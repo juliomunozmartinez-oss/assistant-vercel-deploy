@@ -23,6 +23,15 @@ export default function Home() {
   // Separar respuesta en bloques (por marcador **Copy WhatsApp (cliente):**)
   const [internalBlock, clientBlock] = response.split("**Copy WhatsApp (cliente):**");
 
+  // Función de limpieza: elimina referencias tipo [4:1†archivo†] y [archivo.txt]
+  const cleanText = (text) => {
+    if (!text) return "";
+    return text
+      .replace(/\[\d+:\d+†.*?†\]/g, "") // quita referencias con †
+      .replace(/\[.*?\.txt\]/g, "")       // quita archivos .txt
+      .replace(/\n/g, "<br/>");             // convierte saltos de línea
+  };
+
   return (
     <div className="container">
       {/* Sidebar */}
@@ -65,9 +74,7 @@ export default function Home() {
               <div className="card-header">📋 Respuesta interna (vendedor)</div>
               <div
                 className="card-body"
-                dangerouslySetInnerHTML={{
-                  __html: internalBlock.replace(/\n/g, "<br/>"),
-                }}
+                dangerouslySetInnerHTML={{ __html: cleanText(internalBlock) }}
               />
             </div>
           )}
@@ -77,9 +84,7 @@ export default function Home() {
               <div className="card-header">📲 Copy WhatsApp (cliente)</div>
               <div
                 className="card-body"
-                dangerouslySetInnerHTML={{
-                  __html: clientBlock.replace(/\n/g, "<br/>"),
-                }}
+                dangerouslySetInnerHTML={{ __html: cleanText(clientBlock) }}
               />
             </div>
           )}
