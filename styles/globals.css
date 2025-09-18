@@ -50,6 +50,8 @@ button:hover {
   border: 1px solid #ddd;
   line-height: 1.6;
   font-size: 15px;
+  max-height: 300px;   /* Altura máxima */
+  overflow-y: auto;    /* Scroll vertical */
 }
 
 .response-box h2 {
