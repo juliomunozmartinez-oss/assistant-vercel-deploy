@@ -20,6 +20,9 @@ export default function Home() {
     setLoading(false);
   };
 
+  // Separar respuesta en bloques (por marcador **Copy WhatsApp (cliente):**)
+  const [internalBlock, clientBlock] = response.split("**Copy WhatsApp (cliente):**");
+
   return (
     <div className="container">
       {/* Sidebar */}
@@ -36,3 +39,52 @@ export default function Home() {
           </nav>
         </div>
         <div className="sidebar-bottom">
+          <Image src="/telcel5g.png" alt="Telcel 5G" width={100} height={40} />
+          <p>© 2025 MuGa Holdings de México</p>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="main">
+        <h1>🤖 Asesor Telcel – MuGa</h1>
+
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          rows={4}
+          placeholder="Ejemplo: precio galaxy a06 en libre 2"
+        />
+        <button onClick={sendPrompt}>
+          {loading ? "Generando..." : "Enviar"}
+        </button>
+
+        {/* Tarjetas de respuesta */}
+        <div className="cards-container">
+          {internalBlock && (
+            <div className="card">
+              <div className="card-header">📋 Respuesta interna (vendedor)</div>
+              <div
+                className="card-body"
+                dangerouslySetInnerHTML={{
+                  __html: internalBlock.replace(/\n/g, "<br/>"),
+                }}
+              />
+            </div>
+          )}
+
+          {clientBlock && (
+            <div className="card">
+              <div className="card-header">📲 Copy WhatsApp (cliente)</div>
+              <div
+                className="card-body"
+                dangerouslySetInnerHTML={{
+                  __html: clientBlock.replace(/\n/g, "<br/>"),
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
