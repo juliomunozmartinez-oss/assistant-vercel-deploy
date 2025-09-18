@@ -19,11 +19,14 @@ export default function Home() {
     setLoading(false);
   };
 
+  // Dividir en dos bloques
+  const [internalBlock, clientBlock] = response.split("**Copy WhatsApp (cliente):**");
+
   const toHtml = (text) => {
     if (!text) return "";
     return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **negritas**
-      .replace(/\n/g, "<br/>"); // saltos de línea
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br/>");
   };
 
   return (
@@ -40,10 +43,21 @@ export default function Home() {
         {loading ? "Generando..." : "Enviar"}
       </button>
 
-      <div
-        className="response-box"
-        dangerouslySetInnerHTML={{ __html: toHtml(response) }}
-      />
+      {/* Bloque interno */}
+      {internalBlock && (
+        <div className="response-box">
+          <h2>📋 Respuesta interna (vendedor)</h2>
+          <div dangerouslySetInnerHTML={{ __html: toHtml(internalBlock) }} />
+        </div>
+      )}
+
+      {/* Bloque cliente */}
+      {clientBlock && (
+        <div className="response-box">
+          <h2>📲 Copy WhatsApp (cliente)</h2>
+          <div dangerouslySetInnerHTML={{ __html: toHtml(clientBlock) }} />
+        </div>
+      )}
     </div>
   );
 }

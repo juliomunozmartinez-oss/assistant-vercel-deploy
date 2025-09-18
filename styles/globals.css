@@ -15,7 +15,7 @@ body {
 
 h1 {
   text-align: center;
-  color: #001F5B; /* Azul Telcel */
+  color: #001F5B;
 }
 
 textarea {
@@ -50,4 +50,9 @@ button:hover {
   border: 1px solid #ddd;
   line-height: 1.6;
   font-size: 15px;
+}
+
+.response-box h2 {
+  margin-top: 0;
+  color: #001F5B;
 }
