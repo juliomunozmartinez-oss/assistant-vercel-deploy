@@ -36,27 +36,3 @@ export default function Home() {
           </nav>
         </div>
         <div className="sidebar-bottom">
-          <Image src="/telcel5g.png" alt="Telcel 5G" width={100} height={40} />
-          <p>© 2025 MuGa Holdings de México</p>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="main">
-        <h1>🤖 Asesor Telcel – MuGa</h1>
-
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          rows={4}
-          placeholder="Ejemplo: precio galaxy a06 en libre 2"
-        />
-        <button onClick={sendPrompt}>
-          {loading ? "Generando..." : "Enviar"}
-        </button>
-
-        <div className="response-box">{response}</div>
-      </main>
-    </div>
-  );
-}
