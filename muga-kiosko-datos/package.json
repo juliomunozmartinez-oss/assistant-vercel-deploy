@@ -1,0 +1,13 @@
+{
+  "name": "muga-kiosko-datos",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "ts-node src/index.ts \"iPhone 17 Pro Max 256GB\" \"Libre 4\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
