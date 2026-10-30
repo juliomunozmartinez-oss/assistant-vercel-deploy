@@ -48,6 +48,7 @@ export async function responder(
     { role: "user", content: `${encabezado}\n${textos.join("\n")}` },
   ];
 
+  const textoRespuesta: string[] = [];
   for (let vuelta = 0; vuelta < MAX_VUELTAS_TOOLS; vuelta++) {
     const respuesta = await client.beta.messages.create({
       model: config.modelo,
@@ -73,16 +74,18 @@ export async function responder(
 
     // Se guarda el contenido completo (incluye bloques de thinking), no solo el texto.
     turno.push({ role: "assistant", content: respuesta.content });
+    // El texto escrito antes de usar una herramienta también es parte de la respuesta al cliente.
+    textoRespuesta.push(
+      ...respuesta.content
+        .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
+        .map((b) => b.text.trim())
+        .filter(Boolean),
+    );
 
     const usos = respuesta.content.filter((b): b is Anthropic.Beta.BetaToolUseBlock => b.type === "tool_use");
     if (respuesta.stop_reason !== "tool_use" || usos.length === 0) {
       await deps.store.guardarHistorial(telefono, turno);
-      const texto = respuesta.content
-        .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
-        .map((b) => b.text)
-        .join("\n")
-        .trim();
-      return texto || MENSAJE_RESPALDO;
+      return textoRespuesta.join("\n\n") || MENSAJE_RESPALDO;
     }
 
     // En orden, no en paralelo: ambas herramientas leen y escriben el mismo caso, y
@@ -94,5 +97,6 @@ export async function responder(
   }
 
   await deps.store.guardarHistorial(telefono, turno);
-  return "Gracias, ya tengo registrada su información. Un abogado del despacho le contactará por este número.";
+  return textoRespuesta.join("\n\n") ||
+    "Gracias, ya tengo registrada su información. Un abogado del despacho le contactará por este número.";
 }

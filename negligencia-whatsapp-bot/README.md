@@ -38,6 +38,10 @@ scripts/chat-local.ts  probar el agente en la terminal
 2. Revisa `src/prompt.ts` con el abogado responsable, sobre todo lo que el agente puede y no puede decir.
 3. Ajusta los pesos de `src/scoring.ts` si el despacho prioriza otra cosa.
 
+## Simulador en línea (sin instalar nada)
+
+`demo/` genera una página para claude.ai que usa Claude con la cuenta de quien la abre, sin clave de API ni servidor. Usa el mismo prompt, las mismas herramientas y la misma calificación de `src/`. Para regenerarla después de cambiar el prompt o la calificación: `npm run demo` (crea `demo/dist/simulador.html`) y vuelve a publicarla.
+
 ## Sandbox de pruebas
 
 Página tipo WhatsApp para probar el agente real (mismo prompt, herramientas y calificación) sin WhatsApp ni Redis. A un lado muestra en vivo los datos del caso, la calificación y los avisos que recibiría el abogado. Trae escenarios listos (obstétrico IMSS, muerte del bebé, lipo + BBL, convenio, caso viejo, emergencia, fuera de tema) y un campo **Hoy** para simular otra fecha y probar las alertas de plazos. Nada de lo que pase ahí se guarda como caso real.
