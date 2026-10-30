@@ -21,6 +21,7 @@ Los casos de otras especialidades también se registran (como `otro_negligencia`
 ```
 api/webhook.ts     GET verificación de Meta, POST mensajes entrantes
 api/health.ts      comprobación rápida
+api/sandbox.ts     página de pruebas (requiere SANDBOX_CLAVE)
 src/prompt.ts      instrucciones del agente (qué pregunta, qué nunca dice)
 src/despacho.ts    nombre, horario, aviso de privacidad, honorarios  ← EDITAR
 src/scoring.ts     calificación de casos y resumen para el abogado
@@ -37,12 +38,19 @@ scripts/chat-local.ts  probar el agente en la terminal
 2. Revisa `src/prompt.ts` con el abogado responsable, sobre todo lo que el agente puede y no puede decir.
 3. Ajusta los pesos de `src/scoring.ts` si el despacho prioriza otra cosa.
 
-## Probar en local
+## Sandbox de pruebas
+
+Página tipo WhatsApp para probar el agente real (mismo prompt, herramientas y calificación) sin WhatsApp ni Redis. A un lado muestra en vivo los datos del caso, la calificación y los avisos que recibiría el abogado. Trae escenarios listos (obstétrico IMSS, muerte del bebé, lipo + BBL, convenio, caso viejo, emergencia, fuera de tema) y un campo **Hoy** para simular otra fecha y probar las alertas de plazos. Nada de lo que pase ahí se guarda como caso real.
+
+**En Vercel:** agrega la variable `SANDBOX_CLAVE` (una contraseña que tú inventas) y abre `https://TU-PROYECTO.vercel.app/api/sandbox`. Solo hace falta `ANTHROPIC_API_KEY`; no necesita Meta ni Upstash. Si quitas `SANDBOX_CLAVE`, la página se desactiva.
+
+**En tu computadora:**
 
 ```bash
 npm install
-npm test                                # pruebas sin red
-ANTHROPIC_API_KEY=sk-ant-... npm run chat   # conversación en la terminal (/caso muestra el registro)
+ANTHROPIC_API_KEY=sk-ant-... npm run sandbox   # abre http://localhost:3000, clave: prueba
+ANTHROPIC_API_KEY=sk-ant-... npm run chat      # versión de terminal (/caso muestra el registro)
+npm test                                       # pruebas automáticas, sin red
 ```
 
 ## Desplegar en Vercel

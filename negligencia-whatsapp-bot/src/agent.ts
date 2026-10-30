@@ -85,8 +85,11 @@ export async function responder(
       return texto || MENSAJE_RESPALDO;
     }
 
-    // Todas las respuestas de herramientas van juntas en un solo mensaje de usuario.
-    const resultados = await Promise.all(usos.map((u) => ejecutarTool(u, ctx)));
+    // En orden, no en paralelo: ambas herramientas leen y escriben el mismo caso, y
+    // solicitar_abogado debe ver lo que guardar_datos_caso acaba de guardar.
+    // Todas las respuestas van juntas en un solo mensaje de usuario.
+    const resultados: Anthropic.Beta.BetaToolResultBlockParam[] = [];
+    for (const u of usos) resultados.push(await ejecutarTool(u, ctx));
     turno.push({ role: "user", content: resultados });
   }
 

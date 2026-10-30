@@ -1,5 +1,6 @@
 {
   "functions": {
-    "api/webhook.ts": { "maxDuration": 60 }
+    "api/webhook.ts": { "maxDuration": 60 },
+    "api/sandbox.ts": { "maxDuration": 60 }
   }
 }

@@ -8,7 +8,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test test/*.test.ts",
-    "chat": "tsx scripts/chat-local.ts"
+    "chat": "tsx scripts/chat-local.ts",
+    "sandbox": "tsx scripts/sandbox-local.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
