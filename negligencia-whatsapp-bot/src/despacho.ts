@@ -3,7 +3,7 @@
 // Cambiarlo invalida la caché del prompt una sola vez (es normal).
 
 export const despacho = {
-  nombre: "[PENDIENTE: nombre del despacho]",
+  nombre: "González y Asociados",
   nombreAgente: "Sofía", // nombre del asistente virtual
   ciudad: "San Luis Potosí",
   cobertura: "toda la República Mexicana (reuniones presenciales en San Luis Potosí y en línea)",
