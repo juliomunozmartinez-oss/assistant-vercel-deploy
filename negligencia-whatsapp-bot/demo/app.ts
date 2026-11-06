@@ -1,6 +1,8 @@
-// Simulador en línea del agente. Se publica como página de claude.ai y usa la capacidad
-// `sample` (Claude con la cuenta de quien la abre) en lugar de la API. El prompt, las
-// herramientas y la calificación vienen de src/, así que se comporta como el bot real.
+// Simulador del agente. Se compila en dos versiones (scripts/build-demo.ts):
+// - "claude": página de claude.ai que usa la capacidad `sample` (Claude con la cuenta de
+//   quien la abre). Las herramientas corren aquí, con el prompt y la calificación de src/.
+// - "servidor": la sirve /api/sandbox en Vercel; el agente real corre en el servidor con la
+//   clave de API del despacho y la página solo manda mensajes con la contraseña del sandbox.
 import { despacho } from "../src/despacho.js";
 import { SYSTEM_PROMPT } from "../src/prompt.js";
 import { calificar, type Caso } from "../src/scoring.js";
@@ -8,6 +10,8 @@ import type { Store } from "../src/store.js";
 import { ejecutarTool, TOOLS } from "../src/tools.js";
 
 declare const claude: { use(name: "sample"): Promise<any | null> };
+declare const __MODO__: "claude" | "servidor";
+const SERVIDOR = __MODO__ === "servidor";
 
 const TELEFONO = "5210000000000";
 const CLAVE = "simulador_gya_v1";
@@ -28,9 +32,10 @@ interface Estado {
   burbujas: Burbuja[];
   caso: Caso | null;
   avisos: string[];
+  historialServidor: unknown[]; // historial completo del agente (modo servidor), se devuelve tal cual
 }
 
-const nuevoEstado = (): Estado => ({ turnos: [], burbujas: [], caso: null, avisos: [] });
+const nuevoEstado = (): Estado => ({ turnos: [], burbujas: [], caso: null, avisos: [], historialServidor: [] });
 let estado: Estado = leer(CLAVE) ?? nuevoEstado();
 
 function leer<T>(k: string): T | null {
@@ -165,7 +170,7 @@ const MENSAJES_ERROR: Record<string, string> = {
 async function enviar(texto: string) {
   texto = texto.trim();
   if (!texto || control) return;
-  if (!sample) return;
+  if (!SERVIDOR && !sample) return;
 
   const contenido = `${encabezadoFecha(hoy())}\n${texto}`;
   estado.turnos.push({ role: "user", content: contenido });
@@ -187,28 +192,62 @@ async function enviar(texto: string) {
   control = new AbortController();
   const inicio = performance.now();
   try {
-    const r = await sample([{ role: "user", content: INSTRUCCIONES }, ...turnos], {
-      signal: control.signal,
-      tools: herramientas,
-      ...(modo === "rapido" ? { modelTier: "quick" } : { modelTier: "default", effort: "low" }),
-      onText: ({ text }: { text: string }) => { respuesta.texto = text; pintarChat(); },
-    });
-    respuesta.texto = r.text.trim();
+    if (SERVIDOR) {
+      await enviarAlServidor(texto, respuesta, control.signal);
+    } else {
+      const r = await sample([{ role: "user", content: INSTRUCCIONES }, ...turnos], {
+        signal: control.signal,
+        tools: herramientas,
+        ...(modo === "rapido" ? { modelTier: "quick" } : { modelTier: "default", effort: "low" }),
+        onText: ({ text }: { text: string }) => { respuesta.texto = text; pintarChat(); },
+      });
+      respuesta.texto = r.text.trim();
+    }
     respuesta.hora = hora();
     estado.turnos.push({ role: "assistant", content: respuesta.texto });
     if (estado.avisos.length > avisosAntes) estado.burbujas.push({ quien: "nota", texto: "Se avisó al abogado. Vea el panel de avisos." });
     estado.burbujas.push({ quien: "nota", texto: `${((performance.now() - inicio) / 1000).toFixed(0)} s` });
   } catch (e: any) {
+    if (e?.name === "AbortError") e = { code: "cancelled" };
     if (e?.text) { respuesta.texto = e.text; respuesta.hora = hora(); estado.turnos.push({ role: "assistant", content: e.text }); }
     else estado.burbujas.splice(estado.burbujas.indexOf(respuesta), 1);
     if (e?.code !== "cancelled") {
-      estado.burbujas.push({ quien: "nota", error: true, texto: MENSAJES_ERROR[e?.code] ?? "Se interrumpió la respuesta. Vuelva a enviar el mensaje." });
+      estado.burbujas.push({ quien: "nota", error: true, texto: e?.mensaje ?? MENSAJES_ERROR[e?.code] ?? "Se interrumpió la respuesta. Vuelva a enviar el mensaje." });
     }
   } finally {
     control = null;
     ocupado(false);
     pintar();
   }
+}
+
+const MENSAJES_SERVIDOR: Record<number, string> = {
+  401: "Contraseña incorrecta. Escríbala arriba, en el campo Contraseña.",
+  404: "El simulador está desactivado en este servidor.",
+};
+
+async function enviarAlServidor(texto: string, respuesta: Burbuja, signal: AbortSignal) {
+  const clave = $<HTMLInputElement>("clave").value;
+  if (!clave) throw { mensaje: MENSAJES_SERVIDOR[401] };
+  const r = await fetch(location.pathname, {
+    method: "POST",
+    signal,
+    headers: { "Content-Type": "application/json", "x-sandbox-clave": clave },
+    body: JSON.stringify({
+      textos: [texto],
+      historial: estado.historialServidor,
+      caso: estado.caso,
+      nombrePerfil: $<HTMLInputElement>("perfil").value,
+      fecha: $<HTMLInputElement>("fecha").value || undefined,
+    }),
+  });
+  const datos = await r.json().catch(() => null);
+  if (!r.ok || !datos || datos.error) throw { mensaje: MENSAJES_SERVIDOR[r.status] ?? `El servidor no pudo responder (${datos?.error ?? r.status}).` };
+  try { localStorage.setItem(CLAVE + "_clave", clave); } catch { /* sin almacenamiento */ }
+  respuesta.texto = String(datos.respuesta).trim();
+  estado.historialServidor = datos.historial;
+  estado.caso = datos.caso;
+  estado.avisos.push(...datos.avisos);
 }
 
 function ocupado(si: boolean) {
@@ -233,7 +272,7 @@ function iniciar() {
   $("formulario").addEventListener("submit", (ev) => {
     ev.preventDefault();
     const t = entrada.value;
-    if (!t.trim() || control || !sample) return;
+    if (!t.trim() || control || (!SERVIDOR && !sample)) return;
     entrada.value = "";
     enviar(t);
   });
@@ -257,6 +296,18 @@ function iniciar() {
   };
 
   pintar();
+
+  if (SERVIDOR) {
+    // En el servidor el modelo lo fija la configuración del bot.
+    $("campo-modo").hidden = true;
+    $("campo-clave").hidden = false;
+    try { $<HTMLInputElement>("clave").value = localStorage.getItem(CLAVE + "_clave") ?? ""; } catch { /* sin almacenamiento */ }
+    $<HTMLButtonElement>("enviar").disabled = false;
+    entrada.disabled = false;
+    entrada.placeholder = "Escriba como el cliente… (Enter envía, Shift+Enter salto de línea)";
+    $("pie").textContent = "Simulación: nada se envía por WhatsApp ni se guarda como caso real. Las respuestas usan el agente real del servidor.";
+    return;
+  }
 
   const aviso = $("aviso-estado");
   if (typeof claude === "undefined") { aviso.textContent = "Abra esta página en claude.ai para conversar con el agente."; aviso.hidden = false; return; }

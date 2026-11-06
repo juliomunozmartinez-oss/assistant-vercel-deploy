@@ -42,6 +42,7 @@
     --gris-bg: #263236; --gris: #b6c4c8; --error-bg: #4a1f1a; color-scheme: dark;
   }
 
+  [hidden] { display: none !important; }
   html, body { height: 100%; }
   body { background: var(--fondo); color: var(--tinta); font: 15px/1.45 var(--f-texto); display: flex; flex-direction: column; }
   button, input, select, textarea { font: inherit; color: inherit; }
@@ -125,7 +126,8 @@
   <div class="controles">
     <label for="perfil">Perfil de WhatsApp<input id="perfil" value="Cliente de prueba" size="14"></label>
     <label for="fecha">Fecha simulada<input id="fecha" type="date"></label>
-    <label for="modo">Modo
+    <label for="clave" id="campo-clave" hidden>Contraseña<input id="clave" type="password" size="12" autocomplete="current-password"></label>
+    <label for="modo" id="campo-modo">Modo
       <select id="modo">
         <option value="normal">Normal (más fiel)</option>
         <option value="rapido">Rápido</option>
@@ -151,7 +153,7 @@
     <section><h2>Calificación</h2><div id="calif"></div></section>
     <section><h2>Datos registrados</h2><div id="caso"></div></section>
     <section><h2>Avisos al abogado <span id="contador-avisos"></span></h2><div id="avisos"></div></section>
-    <p class="pie">Simulación: nada se envía por WhatsApp ni se guarda como caso real. Las respuestas usan Claude con la cuenta de quien abre la página.</p>
+    <p class="pie" id="pie">Simulación: nada se envía por WhatsApp ni se guarda como caso real. Las respuestas usan Claude con la cuenta de quien abre la página.</p>
   </aside>
 </main>
 

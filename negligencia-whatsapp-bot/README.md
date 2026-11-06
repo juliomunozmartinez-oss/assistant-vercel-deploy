@@ -21,7 +21,8 @@ Los casos de otras especialidades también se registran (como `otro_negligencia`
 ```
 api/webhook.ts     GET verificación de Meta, POST mensajes entrantes
 api/health.ts      comprobación rápida
-api/sandbox.ts     página de pruebas (requiere SANDBOX_CLAVE)
+api/sandbox.ts     página de pruebas (requiere SANDBOX_CLAVE); también se sirve en /
+demo/              simulador (una página, dos versiones: claude.ai y servidor)
 src/prompt.ts      instrucciones del agente (qué pregunta, qué nunca dice)
 src/despacho.ts    nombre, horario, aviso de privacidad, honorarios  ← EDITAR
 src/scoring.ts     calificación de casos y resumen para el abogado
@@ -46,7 +47,16 @@ scripts/chat-local.ts  probar el agente en la terminal
 
 Página tipo WhatsApp para probar el agente real (mismo prompt, herramientas y calificación) sin WhatsApp ni Redis. A un lado muestra en vivo los datos del caso, la calificación y los avisos que recibiría el abogado. Trae escenarios listos (obstétrico IMSS, muerte del bebé, lipo + BBL, convenio, caso viejo, emergencia, fuera de tema) y un campo **Hoy** para simular otra fecha y probar las alertas de plazos. Nada de lo que pase ahí se guarda como caso real.
 
-**En Vercel:** agrega la variable `SANDBOX_CLAVE` (una contraseña que tú inventas) y abre `https://TU-PROYECTO.vercel.app/api/sandbox`. Solo hace falta `ANTHROPIC_API_KEY`; no necesita Meta ni Upstash. Si quitas `SANDBOX_CLAVE`, la página se desactiva.
+**En Vercel:** agrega la variable `SANDBOX_CLAVE` (una contraseña que tú inventas) y abre la raíz del proyecto, `https://TU-PROYECTO.vercel.app/` (también responde en `/api/sandbox`). Solo hace falta `ANTHROPIC_API_KEY`; no necesita Meta ni Upstash. Si quitas `SANDBOX_CLAVE`, la página se desactiva. La página pide la contraseña, no aparece en buscadores y las respuestas se cobran a la clave de API del proyecto.
+
+**En `simulador.muga.com.mx`:**
+
+1. En Vercel → el proyecto → **Settings → Domains**, agrega `simulador.muga.com.mx`.
+2. En el panel donde se administra el DNS de `muga.com.mx`, crea un registro **CNAME** con nombre `simulador` y el valor que Vercel muestre (normalmente `cname.vercel-dns.com`).
+3. Espera a que Vercel marque el dominio como válido (minutos, a veces hasta unas horas). El certificado HTTPS lo pone Vercel solo.
+4. Abre `https://simulador.muga.com.mx`, escribe la contraseña y prueba.
+
+La página del sandbox es la misma del simulador de claude.ai, compilada en modo servidor (`src/sandbox-pagina.generado.ts`). Si cambias `demo/`, el prompt o la calificación, corre `npm run demo`; una prueba avisa si se te olvida.
 
 **En tu computadora:**
 
